@@ -1,0 +1,284 @@
+{
+  "version": "3.0.0",
+  "exportedAt": "2026-09-12T00:00:00.000Z",
+  "source": "TTF-Agentic-QCSD-Workshop seed brain",
+  "patternCount": 6,
+  "patterns": [
+    {
+      "id": "seed-backoff-cap-after-jitter",
+      "patternType": "test-template",
+      "qeDomain": "test-generation",
+      "domain": "test-generation",
+      "name": "Backoff cap asserted after jitter, not before",
+      "description": "In src/lib/payment-retry.ts, calculateBackoffDelay caps the exponential delay at maxDelayMs and THEN adds up to 50% jitter, so the returned delay can exceed maxDelayMs by half again (10000 becomes up to 15000). A property test must assert the post-jitter bound, or it will pass while the stated contract is broken.",
+      "confidence": 0.9,
+      "usageCount": 3,
+      "successRate": 1,
+      "qualityScore": 0.9,
+      "tier": "long-term",
+      "context": {
+        "language": "typescript",
+        "framework": "vitest",
+        "testType": "unit",
+        "codeContext": "function",
+        "complexity": "medium",
+        "relatedDomains": [
+          "quality-assessment"
+        ],
+        "tags": [
+          "payment-retry",
+          "backoff",
+          "jitter",
+          "property-based",
+          "invariant",
+          "checkout"
+        ]
+      },
+      "template": {
+        "type": "code",
+        "content": "it('keeps {{fn}} within its documented ceiling once jitter is added', () => {\n  for (let attempt = 0; attempt <= {{maxRetries}}; attempt++) {\n    const delay = {{fn}}(attempt, config)\n    expect(delay).toBeGreaterThanOrEqual(0)\n    expect(delay).toBeLessThanOrEqual(config.maxDelayMs)\n  }\n})",
+        "variables": [
+          {
+            "name": "fn",
+            "type": "string",
+            "required": true,
+            "description": "The backoff function under test"
+          },
+          {
+            "name": "maxRetries",
+            "type": "number",
+            "required": true,
+            "description": "Upper attempt bound to sweep"
+          }
+        ]
+      }
+    },
+    {
+      "id": "seed-retry-idempotency-risk",
+      "patternType": "error-handling",
+      "qeDomain": "quality-assessment",
+      "domain": "quality-assessment",
+      "name": "Retry loop carries no idempotency key",
+      "description": "processPaymentWithRetry in src/lib/payment-retry.ts re-invokes the gateway with the same PaymentRequest after a timeout or network error. PaymentRequest has no idempotency key, so a gateway that succeeded but failed to respond will be charged again on retry. Treat this as the highest-risk element of the checkout product, and assert that the same logical payment cannot settle twice.",
+      "confidence": 0.85,
+      "usageCount": 3,
+      "successRate": 1,
+      "qualityScore": 0.88,
+      "tier": "long-term",
+      "context": {
+        "language": "typescript",
+        "framework": "vitest",
+        "testType": "unit",
+        "codeContext": "module",
+        "complexity": "complex",
+        "relatedDomains": [
+          "defect-intelligence",
+          "requirements-validation"
+        ],
+        "tags": [
+          "payment-retry",
+          "idempotency",
+          "double-charge",
+          "risk",
+          "checkout",
+          "gateway"
+        ]
+      },
+      "template": {
+        "type": "prompt",
+        "content": "Check whether {{module}} can settle the same logical payment twice. Look for an idempotency key on the request, a dedupe store keyed by order id, or a gateway contract that guarantees it. Report the gap and the test that would catch it.",
+        "variables": [
+          {
+            "name": "module",
+            "type": "string",
+            "required": true,
+            "description": "Module under assessment"
+          }
+        ]
+      }
+    },
+    {
+      "id": "seed-attempts-counter-overstates",
+      "patternType": "assertion-pattern",
+      "qeDomain": "test-generation",
+      "domain": "test-generation",
+      "name": "Exhausted-retry path reports a fixed attempt count",
+      "description": "On the exhausted path, processPaymentWithRetry returns attempts: config.maxRetries + 1 as a constant rather than the number of gateway calls actually made. Assert attempts against a call-count spy on the gateway, not against the returned field, or the test will agree with the bug.",
+      "confidence": 0.8,
+      "usageCount": 3,
+      "successRate": 1,
+      "qualityScore": 0.82,
+      "tier": "long-term",
+      "context": {
+        "language": "typescript",
+        "framework": "vitest",
+        "testType": "unit",
+        "codeContext": "function",
+        "complexity": "medium",
+        "relatedDomains": [
+          "coverage-analysis"
+        ],
+        "tags": [
+          "payment-retry",
+          "attempts",
+          "spy",
+          "self-reported-state",
+          "checkout"
+        ]
+      },
+      "template": {
+        "type": "code",
+        "content": "const gateway = vi.fn(async () => ({ success: false, error: 'gateway_timeout' }))\nconst result = await {{fn}}(request, gateway, config)\nexpect(gateway).toHaveBeenCalledTimes(result.attempts)",
+        "variables": [
+          {
+            "name": "fn",
+            "type": "string",
+            "required": true,
+            "description": "Retry entry point"
+          }
+        ]
+      }
+    },
+    {
+      "id": "seed-cart-context-untested",
+      "patternType": "coverage-strategy",
+      "qeDomain": "coverage-analysis",
+      "domain": "coverage-analysis",
+      "name": "Cart state layer is the largest untested surface",
+      "description": "aqe hg untested on this repo reports cartReducer, CartProvider and useCart in src/context/CartContext.tsx with no covering test, and aqe code complexity scores that file at cyclomatic 9 and cognitive 17, the highest in src/. Untested plus most branched is where coverage work pays first. Drive the reducer through its action union rather than testing the provider through the UI.",
+      "confidence": 0.9,
+      "usageCount": 3,
+      "successRate": 1,
+      "qualityScore": 0.9,
+      "tier": "long-term",
+      "context": {
+        "language": "typescript",
+        "framework": "vitest",
+        "testType": "unit",
+        "codeContext": "component",
+        "complexity": "medium",
+        "relatedDomains": [
+          "code-intelligence"
+        ],
+        "tags": [
+          "cart",
+          "reducer",
+          "react-context",
+          "coverage-gap",
+          "complexity-hotspot",
+          "checkout"
+        ]
+      },
+      "template": {
+        "type": "workflow",
+        "content": "1. Enumerate every action type handled by {{reducer}}\n2. Assert the state transition for each, including the unknown-action default\n3. Assert quantity and total arithmetic at the boundaries: zero, one, removal of the last line\n4. Only then test {{provider}} through the hook",
+        "variables": [
+          {
+            "name": "reducer",
+            "type": "string",
+            "required": true,
+            "description": "Reducer under test"
+          },
+          {
+            "name": "provider",
+            "type": "string",
+            "required": true,
+            "description": "Context provider"
+          }
+        ]
+      }
+    },
+    {
+      "id": "seed-checkout-form-a11y",
+      "patternType": "a11y-check",
+      "qeDomain": "visual-accessibility",
+      "domain": "visual-accessibility",
+      "name": "Checkout errors are announced but not associated with their field",
+      "description": "In src/components/CheckoutForm.tsx every validation error already renders with role=\"alert\", so screen readers do announce it. The gap is the association: the inputs carry no aria-describedby pointing at their error element, and the source marks this at the gdprConsent field with a \"QUALITY GAP: Missing aria-describedby for WCAG 2.2 AA compliance\" comment. An accessibility assessment that reports \"errors are not announced\" is wrong about this code.",
+      "confidence": 0.85,
+      "usageCount": 3,
+      "successRate": 1,
+      "qualityScore": 0.86,
+      "tier": "long-term",
+      "context": {
+        "language": "typescript",
+        "framework": "vitest",
+        "testType": "unit",
+        "codeContext": "component",
+        "complexity": "medium",
+        "relatedDomains": [
+          "quality-assessment"
+        ],
+        "tags": [
+          "accessibility",
+          "wcag",
+          "aria-invalid",
+          "aria-describedby",
+          "live-region",
+          "checkout-form"
+        ]
+      },
+      "template": {
+        "type": "code",
+        "content": "expect(screen.getByLabelText(/{{field}}/i)).toHaveAttribute('aria-invalid', 'true')\nexpect(screen.getByLabelText(/{{field}}/i)).toHaveAccessibleDescription(/{{message}}/i)",
+        "variables": [
+          {
+            "name": "field",
+            "type": "string",
+            "required": true,
+            "description": "Field label"
+          },
+          {
+            "name": "message",
+            "type": "string",
+            "required": true,
+            "description": "Expected error text"
+          }
+        ]
+      }
+    },
+    {
+      "id": "seed-validation-accepts-shape-not-meaning",
+      "patternType": "assertion-pattern",
+      "qeDomain": "requirements-validation",
+      "domain": "requirements-validation",
+      "name": "Request validation checks shape rather than meaning",
+      "description": "validatePaymentRequest accepts any three-character currency, so 'ZZZ' and '123' pass. Luhn validation in src/lib/luhn.ts likewise proves a number is well formed, not that it is a real card. When an acceptance criterion says valid, ask which of the two it means; that ambiguity is the kind of requirements gap the ideation gate is meant to catch before code.",
+      "confidence": 0.8,
+      "usageCount": 3,
+      "successRate": 1,
+      "qualityScore": 0.84,
+      "tier": "long-term",
+      "context": {
+        "language": "typescript",
+        "framework": "vitest",
+        "testType": "unit",
+        "codeContext": "function",
+        "complexity": "simple",
+        "relatedDomains": [
+          "test-generation"
+        ],
+        "tags": [
+          "validation",
+          "currency",
+          "luhn",
+          "requirements-gap",
+          "testability",
+          "checkout"
+        ]
+      },
+      "template": {
+        "type": "prompt",
+        "content": "For every use of the word valid in {{artifact}}, state whether it means well formed or genuine, and name the test that distinguishes them.",
+        "variables": [
+          {
+            "name": "artifact",
+            "type": "string",
+            "required": true,
+            "description": "Requirement or AC document"
+          }
+        ]
+      }
+    }
+  ]
+}

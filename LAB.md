@@ -13,7 +13,9 @@
 
 **実測の所要時間**（2026年11月6日、AQE 3.15.18、Claude Code、無人実行）: 演習1 6.7分 / $2.25 · 演習2 3.3分 / $0.52 · 演習3 3.0分 / $0.55 · 演習4 1.4分 / $0.34 · 演習5 1.0分 / $0.29。コア演習5つで約15分、$3.96です。発展演習は、2b が 5.7分 / $0.99、2c が 6.0分 / $0.95 を追加します。対話的に実行すると、ツール呼び出しを承認する分だけ長くなります。使うモデルによって、時間もコストも変わります。
 
-**始める前に:** [コンテナのセットアップ](./docs/DEVCONTAINER.md) または [README](./README.md) の手動セットアップ（Node 22.13 以上 → クローン → `npm install -g agentic-qe@latest` → `aqe init --auto --with-<お使いのツール>` → `npm install` → `aqe code index src/` → `npm install -g @huggingface/transformers@4.2.0`）を終えてから、ここでエージェントを起動してください。**`aqe init` を省略しないでください**（エージェント、MCP 設定、メモリ DB がインストールされます。コンテナ版では自動で行われます）。**演習は順番どおりに実行してください**（3は2の出力を読み、4は3がテストしたモジュールを評価し、5は1〜4が保存した内容を呼び出し、2b は2の出力を読みます）。パスはリポジトリのルートからの相対パスです。
+**2026年11月11日に再検証しました。** AQE 3.15.19（現在のリリース）と Claude Code（claude-opus-5-5）で無人実行し、コア演習5つと発展演習2つがすべてエラーなく完了しました。このより大きなモデルでの時間とコスト: 演習1 21.9分 / $11.79（CONDITIONAL、9つの AI エージェントのうち6つ）· 演習2 8.2分 / $2.06 · 演習3 7.3分 / $2.00（生成されたテスト145件、すべて合格）· 演習4 7.3分 / $1.90（NO-GO）· 演習5 2.5分 / $1.10 · 2b 6.4分 / $2.39 · 2c 6.9分 / $2.20。大きなモデルを使う場合は、演習1は枠が始まったらすぐに開始してください。
+
+**始める前に:** [コンテナのセットアップ](./docs/DEVCONTAINER.md) または [README](./README.md) の手動セットアップ（Node 22.13 以上 → クローン → `npm install -g agentic-qe@latest` → `aqe init --auto --with-<お使いのツール>` → `npm install` → `aqe code index src/` → `npm install -g @huggingface/transformers@4.2.0` → `aqe learning import -i seed/aqe-seed-patterns.json`）を終えてから、ここで AI エージェントを起動してください。**`aqe init` を省略しないでください**（AI エージェント、MCP 設定、メモリ DB がインストールされます。コンテナ版では自動で行われます）。**演習は順番どおりに実行してください**（3は2の出力を読み、4は3がテストしたモジュールを評価し、5は1〜4が保存した内容を呼び出し、2b は2の出力を読みます）。パスはリポジトリのルートからの相対パスです。
 
 ---
 
@@ -45,7 +47,7 @@ aqe memory usage
 
 > *フェーズ:* アイデア出し · *目的:* エピックに QE のアイデア出しの観点を適用し、*コードを1行も書く前に* リリースゲートを判定します。
 
-> *追加の2行がある理由:* 以前のドライラン（2026年10月1日、AQE 3.14.1、Claude Code）では、スウォームのセキュリティ監査が最大の労力で動き、放置すると30分以上と数十回の Web 取得を費やしました。ファイルに範囲を絞り、セキュリティ監査を外すと、スウォームはセッション内に終わり、それでも GO / CONDITIONAL / NO-GO の判定を出します。2026年11月6日に AQE 3.15.18 で再実行した結果は、6.7分 / $2.25、判定は CONDITIONAL、リスク39件で、9つのエージェントのうち6つが動きました。
+> *追加の2行がある理由:* 以前のドライラン（2026年10月1日、AQE 3.14.1、Claude Code）では、スウォームのセキュリティ監査が最大の労力で動き、放置すると30分以上と数十回の Web 取得を費やしました。ファイルに範囲を絞り、セキュリティ監査を外すと、スウォームはセッション内に終わり、それでも GO / CONDITIONAL / NO-GO の判定を出します。2026年11月6日に AQE 3.15.18 で再実行した結果は、6.7分 / $2.25、判定は CONDITIONAL、リスク39件で、9つの AI エージェントのうち6つが動きました。
 
 **▸ Claude Code ユーザー**: オーケストレーションされたアイデア出しスウォームです。`qcsd-ideation-swarm` はコマンドファイルではなく **skill** としてインストールされます。お使いの Claude Code のビルドでスラッシュの後に表示されない場合は、名前で依頼してください（「Use the qcsd-ideation-swarm skill to ...」）。
 
@@ -72,7 +74,7 @@ only, with no web research. Then:
 1. Recommend the quality criteria that matter most (HTSM: capability,
    reliability, security, performance, usability, …)
 2. Identify the top risks and score each by likelihood × impact
-3. Validate requirements completeness and testability — flag gaps,
+3. Validate requirements completeness and testability: flag gaps,
    contradictions, and unmeasurable acceptance criteria
 4. Render a single GO / CONDITIONAL / NO-GO verdict with the top blockers
 5. Save the assessment to reports/01-ideation-assessment.md
@@ -85,7 +87,7 @@ only, with no web research. Then:
 
 > *フェーズ:* リファインメント · *目的:* プロダクトを実際の構成要素（SFDIPOT）に分解し、優先順位つきのテストアイデアにします。演習3がこれを使います。
 
-**▸ Claude Code ユーザー**: プロダクトファクターのエージェントです。
+**▸ Claude Code ユーザー**: プロダクトファクターの AI エージェントです。
 
 ```
 Use qe-product-factors-assessor to analyse the guest-checkout product
@@ -138,7 +140,7 @@ Generate tests for the payment-retry logic in src/lib/payment-retry.ts:
 1. Read reports/02-refinement-product-factors.md and src/lib/payment-retry.ts
 2. Write a comprehensive vitest test file covering the happy path, edge
    cases, error paths, and the module's invariants (use property-style
-   tests where useful — e.g. idempotency, backoff bounds, retry limits)
+   tests where useful, e.g. idempotency, backoff bounds, retry limits)
 3. Make sure the file imports from src/lib/payment-retry.ts and runs
 4. Save the test file as tests/lib/payment-retry.architect.test.ts and a
    short rationale to reports/03-development-tests.md
@@ -153,7 +155,7 @@ Generate tests for the payment-retry logic in src/lib/payment-retry.ts:
 
 > *フェーズ:* CI/CD · *目的:* 新しいものは何も生成しません。*測定し、スキャンし、ゲートにかけ、推奨します。* テストが付いたコードに対するリリース判断です。
 
-**▸ Claude Code ユーザー**: queen-coordinator が検証用のエージェント群を指揮します。
+**▸ Claude Code ユーザー**: queen-coordinator が検証用の AI エージェント群を指揮します。
 
 ```
 Use qe-queen-coordinator to run a verification-only quality assessment of
@@ -169,7 +171,7 @@ Save learnings and persist patterns.
 
 ```
 Run a verification-only quality assessment of src/lib/payment-retry.ts
-and decide on release. Do NOT generate tests — assess what exists:
+and decide on release. Do NOT generate tests; assess what exists:
 
 1. Analyse coverage gaps with risk scoring
 2. Review the module for security issues
@@ -180,24 +182,24 @@ and decide on release. Do NOT generate tests — assess what exists:
 6. Save learnings and persist patterns
 ```
 
-> *期待されるカバレッジ:* 演習3の前に `npm run test:coverage` を実行すると、`src/` 全体で **61.62%**、`src/lib/payment-retry.ts` は **ステートメント 100% / ブランチ 97.29%** と表示されます。演習3の後は、このモジュールの4つの指標がすべて 100% になります。カバレッジだけなら 90% を超えますが、判定は NO-GO になり得ます。2026年11月6日の AQE 3.15.18 での実行では、エージェントは 109 件のテストがすべて成功し、カバレッジ 100% のモジュールを評価しながら、それでも **NO-GO** を返しました。冪等性キーがなく、ゲートウェイのタイムアウトがなく、投げられたエラーをすべてリトライするためです。AQE のゲート呼び出し自体は「insufficient evidence」を返したので、レポートの合否は、エージェントが計測値に 90% のしきい値を自分で当てはめた結果です。モジュールを読んで比較してください。全体が約 **38%** と表示される場合、クローンがテスト範囲の修正より前のものです。`git pull` して再実行してください。
+> *期待されるカバレッジ:* 演習3の前に `npm run test:coverage` を実行すると、`src/` 全体で **61.62%**、`src/lib/payment-retry.ts` は **ステートメント 100% / ブランチ 97.29%** と表示されます。演習3の後は、このモジュールの4つの指標がすべて 100% になります。カバレッジだけなら 90% を超えますが、判定は NO-GO になり得ます。2026年11月6日の AQE 3.15.18 での実行では、AI エージェントは 109 件のテストがすべて成功し、カバレッジ 100% のモジュールを評価しながら、それでも **NO-GO** を返しました。冪等性キーがなく、ゲートウェイのタイムアウトがなく、投げられたエラーをすべてリトライするためです。AQE のゲート呼び出し自体は「insufficient evidence」を返したので、レポートの合否は、AI エージェントが計測値に 90% のしきい値を自分で当てはめた結果です。モジュールを読んで比較してください。全体が約 **38%** と表示される場合、クローンがテスト範囲の修正より前のものです。`git pull` して再実行してください。
 
 > *注:* このアプリは、テスト可能なロジックを `src/lib/` に置いています（決済、Luhn、バリデーション、レート制限、メール）。**`src/services/` はありません。** 実行が速く終わるよう、1ファイルに絞っています。より広く検証したい場合は `src/lib/` に広げてください。
 
 ---
 
-## 演習5: 自己学習。エージェント群のメモリを使う（約10分）
+## 演習5: 自己学習。AI エージェント群のメモリを使う（約10分）
 
-> *目的:* ここまでの各演習は、**「Save learnings and persist patterns.」** で終わりました。その成果を確かめます。エージェント群は学びを仕舞い込んだだけではありません。**まとめて、必要なときに** 返せます。組織の知識が、あなたのために働きます。どのツールでも同じプロンプトです。
+> *目的:* ここまでの各演習は、**「Save learnings and persist patterns.」** で終わりました。その成果を確かめます。AI エージェント群は学びを仕舞い込んだだけではありません。**まとめて、必要なときに** 返せます。組織の知識が、あなたのために働きます。どのツールでも同じプロンプトです。
 
 ```
 Recall from AQE memory what the fleet learned about this checkout app
-across Exercises 1–4 — payment retry, cart state, checkout form
+across Exercises 1–4: payment retry, cart state, checkout form
 accessibility, and request validation.
 
 First list what you recalled: each pattern's name and one line on what it
-says. Then consolidate that into a one-page brief — top risks, testability
-gaps, contradictions, and the release verdict — framed as either:
+says. Then consolidate that into a one-page brief (top risks, testability
+gaps, contradictions, and the release verdict), framed as either:
   • an onboarding brief for someone joining the project today, or
   • a handoff document for the next person enhancing the checkout app.
 
@@ -217,7 +219,7 @@ Save the brief to reports/05-handoff-brief.md.
 
 > *Claude Code 以外を使っている場合:* Claude Code は、ReasoningBank フックにより、学びを自動で記録し、想起します。他のツールは、同じ作業を `memory_store` / `memory_query` MCP ツール経由で行います。そこで想起されない場合は、上のシードを読み込み、他を調べる前に `aqe learning stats` が 76 以上であることを確認してください。
 
-**なぜこれが利点なのか。** 4つのレポートを読み直す必要はありませんでした。エージェント群は、各演習が保存した内容から、プロジェクトの組織知を数秒で再構成しました。新しいチームメンバーや次回の実行は、そのすべてをすぐに引き継げます。*（Claude Code では、この記録は自動です。ReasoningBank フックと `AQE Learning: N patterns loaded…` のバナーがそれです。）* これが自己学習のループです。**覚えている** AI エージェントは、ゼロから始める AI エージェントより優れています。
+**なぜこれが利点なのか。** 4つのレポートを読み直す必要はありませんでした。AI エージェント群は、各演習が保存した内容から、プロジェクトの組織知を数秒で再構成しました。新しいチームメンバーや次回の実行は、そのすべてをすぐに引き継げます。*（Claude Code では、この記録は自動です。ReasoningBank フックと `AQE Learning: N patterns loaded…` のバナーがそれです。）* これが自己学習のループです。**覚えている** AI エージェントは、ゼロから始める AI エージェントより優れています。
 
 ---
 ## 発展演習: 早く終わった方と、セッション後のために
@@ -226,7 +228,7 @@ Save the brief to reports/05-handoff-brief.md.
 
 ### 演習2b（発展）: 探索的カバレッジ。プロダクトファクターからチャーターを作る（約20分）
 
-> *フェーズ:* リファインメント · *目的:* プロダクトファクターは、プロダクトが *何でできているか* を教えてくれます。探索は、それがどう振る舞うかを教えてくれます。エージェントが演習2のテストアイデアからチャーターを作り、コードレベルで最初の一巡を行います。あなたは重要なチャーターを選び、見つかったものを判断します。
+> *フェーズ:* リファインメント · *目的:* プロダクトファクターは、プロダクトが *何でできているか* を教えてくれます。探索は、それがどう振る舞うかを教えてくれます。AI エージェントが演習2のテストアイデアからチャーターを作り、コードレベルで最初の一巡を行います。あなたは重要なチャーターを選び、見つかったものを判断します。
 
 **▸ Claude Code ユーザー**: 探索的テストの skill です。
 
@@ -264,9 +266,9 @@ Turn the refinement ideas into exploratory coverage for the guest checkout:
 
 ### 演習2c（発展）: 欠陥リスクプロファイル。バグはどこに出るか（約15分）
 
-> *フェーズ:* リファインメント → 開発 · *目的:* テストを書く前に、どこに書けば効果が出るかを決めます。欠陥予測エージェントがモジュールを欠陥リスクで順位づけします。その順位が、演習3で `payment-retry.ts` を選んだことと一致するかを確認します。
+> *フェーズ:* リファインメント → 開発 · *目的:* テストを書く前に、どこに書けば効果が出るかを決めます。欠陥予測 AI エージェントがモジュールを欠陥リスクで順位づけします。その順位が、演習3で `payment-retry.ts` を選んだことと一致するかを確認します。
 
-**▸ Claude Code ユーザー**: 欠陥予測エージェントです。
+**▸ Claude Code ユーザー**: 欠陥予測 AI エージェントです。
 
 ```
 Use qe-defect-predictor to build a defect risk profile for every
@@ -308,11 +310,11 @@ PACTS は、Agentic QE フレームワークの評価の観点です（[agentic-
 - **Autonomous（自律）?** 何を調べるかを自分で決めたか。それとも、あなたの指示を待ったか。
 - **Collaborative（協調）?** 複数の関心事（と複数の演習）にまたがって発見を結びつけたか。それとも、それぞれを個別に扱ったか。
 - **Targeted（的確）?** *この* チェックアウトフローに合った分析か。それとも、一般的なチェックリストか。
-- **Structured（構造化）?** すべての結論を、それを出したエージェント、読んだ入力、示した理由までたどれるか。それとも、信じるしかないか。
+- **Structured（構造化）?** すべての結論を、それを出した AI エージェント、読んだ入力、示した理由までたどれるか。それとも、信じるしかないか。
 
 2人1組で、各レポートを各項目0〜3で採点します。最も意外だった弱点を共有してください。
 
-> **エンジンを比較する。** ペアに Claude Code ユーザーと Claude Code 以外のユーザーがいる場合、同じ演習の2つのレポートを比較してください。オーケストレーションされたスウォームは、ステップ一覧版が見逃したものを見つけたでしょうか（その逆も）。その差が、オーケストレーション層の価値です。2026年11月6日の実行では、ステップ一覧のプロンプトと Claude Code のプロンプトは、演習1で一致し（CONDITIONAL）、演習4で分かれました。オーケストレーション版は `payment-retry.ts` に NO-GO を返し（109件中109件のテストが成功、カバレッジ100%、冪等性キーなし、ゲートウェイのタイムアウトなし）、ステップ一覧版は同じモジュールに CONDITIONAL を返しました（120件のテスト、カバレッジ100%、決済の安全性に関する3つの穴を塞ぐ）。ステップ一覧のエージェントは、AQE のエージェントを実行せず、分析を自分で行ったとも述べています。両方を読み、どの判定に自分なら署名するかを決めてください。
+> **エンジンを比較する。** ペアに Claude Code ユーザーと Claude Code 以外のユーザーがいる場合、同じ演習の2つのレポートを比較してください。オーケストレーションされたスウォームは、ステップ一覧版が見逃したものを見つけたでしょうか（その逆も）。その差が、オーケストレーション層の価値です。2026年11月6日の実行では、ステップ一覧のプロンプトと Claude Code のプロンプトは、演習1で一致し（CONDITIONAL）、演習4で分かれました。オーケストレーション版は `payment-retry.ts` に NO-GO を返し（109件中109件のテストが成功、カバレッジ100%、冪等性キーなし、ゲートウェイのタイムアウトなし）、ステップ一覧版は同じモジュールに CONDITIONAL を返しました（120件のテスト、カバレッジ100%、決済の安全性に関する3つの穴を塞ぐ）。ステップ一覧の AI エージェントは、AQE の AI エージェントを実行せず、分析を自分で行ったとも述べています。両方を読み、どの判定に自分なら署名するかを決めてください。
 
 ---
 
@@ -322,9 +324,9 @@ PACTS は、Agentic QE フレームワークの評価の観点です（[agentic-
 
 1. **私の環境**: チーム、技術スタック、今、品質で最も困っている点: ______
 2. **取り戻したい70%**: チームの時間を奪っている、事務的なテスト作業のうち、AI エージェントに *最初に* 任せられるものは何か: ______
-3. **最初に導入する3つの AI エージェント**: `.claude/agents/v3/` のエージェント群から選ぶ（例: `qe-requirements-validator`、`qe-product-factors-assessor`、`qe-test-architect`、`qe-queen-coordinator`）: ______
+3. **最初に導入する3つの AI エージェント**: `.claude/agents/v3/` の AI エージェント群から選ぶ（例: `qe-requirements-validator`、`qe-product-factors-assessor`、`qe-test-architect`、`qe-queen-coordinator`）: ______
 4. **最初に始める QCSD フェーズ**: アイデア出しのゲート、リファインメント、開発、CI/CD のどれか: ______
 5. **2週間後の成功指標**: うまくいったとどう判断するか（例: *リファインメントで* 見つけた矛盾の数、最もリスクの高いモジュールのカバレッジ、GO/NO-GO 判断の速さ）: ______
 6. **月曜日の最初の一歩**: 実際にやる、いちばん小さなこと: ______
 
-> 小さく始めてください。AI エージェント1つ、フェーズ1つ、リポジトリ1つ、指標1つです。エージェント群の全体（60の AI エージェントと86のスキル、MIT ライセンス）は、`aqe init` の時点で、すでにお使いの PC に入っています。出し惜しみはありません。困っている所から始めてください。
+> 小さく始めてください。AI エージェント1つ、フェーズ1つ、リポジトリ1つ、指標1つです。AI エージェント群の全体（60の AI エージェントと86のスキル、MIT ライセンス）は、`aqe init` の時点で、すでにお使いの PC に入っています。出し惜しみはありません。困っている所から始めてください。

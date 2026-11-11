@@ -4,6 +4,8 @@
 
 **ハーフデイ・チュートリアル · 2026年11月12日（木） · 13:00〜16:00 · ファシリテーター: Lalitkumar Bhamare、Dragan Spiridonov**
 
+> **著作者と利用条件。** QCSD、Agentic QCSD、Designed Agency は Lalitkumar Bhamare の独自の成果物で、[CC BY 4.0](https://talesoftesting.com/qcsd/) で提供しています。再利用には本人のクレジット表記が必要です。[Agentic QE](https://github.com/proffesor-for-testing/agentic-qe) フレームワークは Dragan Spiridonov による MIT ライセンスのオープンソースで、Lalitkumar Bhamare が主要な貢献者です。**チュートリアルのスライドは無断転載禁止です。Lalitkumar Bhamare と Dragan Spiridonov に相談せずに再作成、再配布、再公開することを禁じます。** 詳細: [NOTICE.md](./NOTICE.md)。
+
 **Agentic QCSD** は、自律的に動く AI 品質エージェントを *デリバリーのライフサイクル全体* に配置する考え方です。テストを生成するだけでなく、要件、プロダクトリスク、コード品質、セキュリティ、アクセシビリティを、品質エンジニアと同じ視点で推論させます。このセッションでは、AI エージェント群（**[Agentic QE](https://github.com/proffesor-for-testing/agentic-qe)**）を SDLC の4つのフェーズで動かし、エージェントが *自分から* 見つけたものを確認し、その出力を **PACTS**（Proactive、Autonomous、Collaborative、Targeted、Structured）の観点で評価します。
 
 AI エージェントには、実際に分析できる対象が必要です。そこでこのリポジトリには、意図的に欠陥を仕込んだ小さな EC アプリを **テスト対象** として同梱しています。詳しくは下の [デモアプリ](#デモアプリ) を参照してください。

@@ -37,11 +37,19 @@ a.card span{font-size:16px;line-height:1.6;color:var(--t1)}
 .box.lab{margin-top:14px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
 .box.lab .lbl{margin:0}
 .rights{padding-left:16px}
+
+body{background:linear-gradient(90deg,rgba(6,5,12,.78) 0%,rgba(6,5,12,.45) 50%,rgba(6,5,12,.15) 100%),linear-gradient(0deg,rgba(6,5,12,.9) 0%,rgba(6,5,12,.2) 60%,rgba(6,5,12,0) 100%),url(img-568a37f235.jpg) 28% 40%/160% auto no-repeat fixed,#0A0A0F}
+@media (max-width:900px){body{background-size:cover,cover,cover;background-position:0 0,0 0,60% 30%}}
+a.card,.box{background:rgba(18,18,26,.86);backdrop-filter:blur(2px)}
+.head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}
+.ttf{flex:none;background:#fff;border-radius:10px;padding:6px;height:76px}
+.cred{position:fixed;right:14px;bottom:10px;font-size:11px;color:rgba(255,255,255,.7)}
+@media (max-width:560px){.ttf{height:52px}.cred{position:static;display:block;margin-top:14px;text-align:right}}
 </style>
 </head>
 <body>
 <main>
-<span class="k">Tokyo Test Fest 2026 · Half-day tutorial</span>
+<div class="head"><span class="k">Tokyo Test Fest 2026 · Half-day tutorial</span><img class="ttf" src="img-f85e67a6d0.jpg" alt="Tokyo Test Fest"></div>
 <h1>The 70% Problem</h1>
 <div class="rule"></div>
 <p class="sub">Reclaiming Testing’s Intellectual Core with Agentic QCSD</p>
@@ -53,8 +61,8 @@ a.card span{font-size:16px;line-height:1.6;color:var(--t1)}
 <div class="box lab"><span class="lbl">Hands-on lab</span><a href="https://github.com/fndlalit/TTF-Agentic-QCSD-Workshop">TTF-Agentic-QCSD-Workshop</a><a href="https://github.com/fndlalit/TTF-Agentic-QCSD-Workshop-JA">日本語版リポジトリ</a></div>
 <div class="box rights"><span class="lbl">Rights and licences</span>
 <p><b>Slides © 2026 Lalitkumar Bhamare and Dragan Spiridonov. All rights reserved.</b><br>Recreating, redistributing or republishing them without consulting both authors is forbidden.</p>
-<p>QCSD, Agentic QCSD and Designed Agency © Lalitkumar Bhamare, licensed under <a href="https://talesoftesting.com/qcsd/">CC BY 4.0</a>.<br>Details in <a href="https://github.com/fndlalit/TTF-Agentic-QCSD-Workshop/blob/main/NOTICE.md">NOTICE</a>.</p>
 </div>
+<span class="cred">Photo: Ramon Buçard / Unsplash</span>
 </main>
 </body>
 </html>

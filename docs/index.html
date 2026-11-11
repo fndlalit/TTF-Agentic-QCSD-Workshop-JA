@@ -8,7 +8,7 @@
 :root{--bg:#0A0A0F;--card:#14141C;--line:#2A2A36;--t0:#F4F4F8;--t1:#C9C9D6;--t2:#9A9AAB;--p:#A100FF;--pl:#C97CFF;--a:#F5A524}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--t1);font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,"Hiragino Sans","Yu Gothic",sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px}
-main{max-width:760px;width:100%}
+main{max-width:760px;width:100%;margin:0 auto}
 .k{font:600 12px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.24em;text-transform:uppercase;color:var(--a)}
 h1{color:var(--t0);font-size:clamp(36px,7vw,60px);line-height:1.05;margin:14px 0 10px;letter-spacing:-.03em}
 .rule{width:96px;height:4px;border-radius:2px;background:linear-gradient(90deg,var(--p),var(--a));margin:0 0 16px}
@@ -19,9 +19,15 @@ a.card{display:block;text-decoration:none;background:var(--card);border:1px soli
 a.card:hover{border-color:var(--pl);transform:translateY(-2px)}
 a.card b{display:block;color:var(--t0);font-size:20px;margin-bottom:4px}
 a.card span{font-size:14px;color:var(--t2)}
-.note{margin-top:22px;font-size:14px;color:var(--t2)}
-.note a{color:var(--pl)}
-@media (max-width:560px){.grid{grid-template-columns:1fr}}
+.info{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 22px;font-size:14px;color:var(--t1);line-height:1.6}
+.box .lbl{display:block;font:600 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--t2);margin-bottom:10px}
+.box a{color:var(--pl)}
+.box p{margin:0}.box p+p{margin-top:8px}
+.rights{margin-top:14px;border-left:3px solid var(--a)}
+.rights .lbl{color:var(--a)}
+.rights b{color:var(--t0);font-weight:600}
+@media (max-width:560px){.grid,.info{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -32,11 +38,17 @@ a.card span{font-size:14px;color:var(--t2)}
 <p class="sub">Reclaiming Testing’s Intellectual Core with Agentic QCSD</p>
 <p class="meta">Lalitkumar Bhamare and Dragan Spiridonov · 12 November 2026</p>
 <div class="grid">
-<a class="card" href="https://fndlalit.github.io/TTF-Agentic-QCSD-Workshop/tutorial.html"><b>English slides</b><span>Open the deck · includes Dragan’s video</span></a>
-<a class="card" href="https://fndlalit.github.io/TTF-Agentic-QCSD-Workshop-JA/tutorial.html"><b>日本語スライド</b><span>スライドを開く · Dragan のビデオを含む</span></a>
+<a class="card" href="https://fndlalit.github.io/TTF-Agentic-QCSD-Workshop/tutorial.html"><b>English slides</b><span>The story from QCSD to Agentic QCSD, five hands-on AI agent swarms and the AQE framework from its creator</span></a>
+<a class="card" href="https://fndlalit.github.io/TTF-Agentic-QCSD-Workshop-JA/tutorial.html"><b>日本語スライド</b><span>QCSD から Agentic QCSD へのストーリー、AI エージェントのスウォームを使う5つの演習、考案者による AQE 紹介</span></a>
 </div>
-<p class="note">Arrow keys or a clicker move between slides, F for full screen. Hands-on lab: <a href="https://github.com/fndlalit/TTF-Agentic-QCSD-Workshop">TTF-Agentic-QCSD-Workshop</a> · <a href="https://github.com/fndlalit/TTF-Agentic-QCSD-Workshop-JA">日本語版</a></p>
-<p class="note">Slides © 2026 Lalitkumar Bhamare and Dragan Spiridonov. All rights reserved. Recreating, redistributing or republishing them without consulting both authors is forbidden. QCSD, Agentic QCSD and Designed Agency © Lalitkumar Bhamare, <a href="https://talesoftesting.com/qcsd/">CC BY 4.0</a>. See <a href="https://github.com/fndlalit/TTF-Agentic-QCSD-Workshop/blob/main/NOTICE.md">NOTICE</a>.</p>
+<div class="info">
+<div class="box"><span class="lbl">Presenting</span><p>Arrow keys or a clicker move between slides. F toggles full screen.</p></div>
+<div class="box"><span class="lbl">Hands-on lab</span><p><a href="https://github.com/fndlalit/TTF-Agentic-QCSD-Workshop">TTF-Agentic-QCSD-Workshop</a></p><p><a href="https://github.com/fndlalit/TTF-Agentic-QCSD-Workshop-JA">日本語版リポジトリ</a></p></div>
+</div>
+<div class="box rights"><span class="lbl">Rights and licences</span>
+<p><b>Slides © 2026 Lalitkumar Bhamare and Dragan Spiridonov. All rights reserved.</b> Recreating, redistributing or republishing them without consulting both authors is forbidden.</p>
+<p>QCSD, Agentic QCSD and Designed Agency © Lalitkumar Bhamare, licensed under <a href="https://talesoftesting.com/qcsd/">CC BY 4.0</a>. Details in <a href="https://github.com/fndlalit/TTF-Agentic-QCSD-Workshop/blob/main/NOTICE.md">NOTICE</a>.</p>
+</div>
 </main>
 </body>
 </html>
